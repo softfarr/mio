@@ -1,15 +1,14 @@
-{% extends "maestra.html" %}
+{% extends "base.html" %}
 {% block titulo %}
 Editar usuario
 {% endblock %}
 {{usuario}}
-<!--
 {% block contenido %}
 <section class="section">
     <div class="columns">
         <div class="column">
             <h3 class="is-size-3">Editar usuario</h3>
-            <form action="{{url_for('actualizar_usuario')}}" method="post">
+            <form action="{{url_for('validar_actualizar_usuario')}}" method="post">
                 {# Enviar el id en un campo oculto #}
                 <input type="hidden" name="id" value="{{usuario[0]}}">
                 <label for="nombre">Nombre:</label>
@@ -29,4 +28,3 @@ Editar usuario
     </div>
 </section>
 {% endblock %}
--->

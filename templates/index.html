@@ -6,7 +6,7 @@
     <div class="columns">
         <div class="column">
             <h3 class="is-size-3">Usuarios</h3>
-            <a href="{{url_for('agregar_usuario')}}" class="button is-success">Agregar</a>                
+            <a href="{{url_for('mostrar_form_agregar_usuario')}}" class="button is-success">Agregar</a>                
             <table class="table">
                 <thead>
                     <tr>
@@ -42,7 +42,7 @@
                             </td>
                             <td>
                                 {# Pasar el id (lo que hay en juego[0] #}
-                                <a href="{{url_for('editar_usuario', id=usuario[0])}}" class="button is-info">Editar</a>
+                                <a href="{{url_for('mostrar_form_editar_usuario', id=usuario[0])}}" class="button is-info">Editar</a>
                                 <td><form action="{{url_for('eliminar_usrio')}}" method="POST">
                                     <input type="hidden" name="id" value="{{usuario[0]}}">
                                     <button class="button is-danger">Eliminar</button>

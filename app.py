@@ -53,14 +53,11 @@ app= Flask (__name__)
 
 @app.route('/')
 def home():
-    try: 
-        usuarios = obtener_usuarios()
-        return render_template("index.html", usuarios=usuarios)
-    except Exception as e: 
-        return str(e)
+    usuarios = obtener_usuarios()
+    return render_template("index.html", usuarios=usuarios)
     
 @app.route('/agregar_usuario')
-def agregar_usuario():
+def mostrar_form_agregar_usuario():
     return render_template("agregar_usuario.html")
 
 @app.route("/guardar_usuario", methods=["POST"])
@@ -70,31 +67,28 @@ def guardar_usuario():
     correo = request.form["correo"]
     nacionalidad = request.form["nacionalidad"]
     password = request.form["password"]
-    print(__name__)
     insertar_usuario(nombre, apellido, correo, nacionalidad, password)
     return redirect(url_for("home"))
 
 @app.route("/eliminar_usuario", methods=["POST"])
 def eliminar_usrio():
-    print(__name__, request.form["id"])
     eliminar_usuario(request.form["id"])
     return redirect(url_for("home"))
 
-@app.route('/editar_usuario/<string:id>', methods=['POST'])
-def editar_usuario(id):
-    id=request.form['id']
+@app.route('/editar_usuario/<string:id>', methods=['GET', 'POST'])
+def mostrar_form_editar_usuario(id):
     usuario = obtener_usuario_por_id(id)
-    print(usuario)
-    return render_template("ed_usuario.html", usuario=usuario)
+    return render_template("editar_usuario.html", usuario=usuario)
 
 @app.route("/actualizar_usuario", methods=["POST"])
-def actualizar_usuario():
+def validar_actualizar_usuario():
     id = request.form["id"]
     nombre = request.form["nombre"]
     apellido = request.form["apellido"]
     correo = request.form["correo"]
     nacionalidad = request.form["nacionalidad"]
     password = request.form["password"]
+    print(nombre, apellido, correo, nacionalidad, password, id)
     actualizar_usuario(nombre, apellido, correo, nacionalidad, password, id)
     return redirect("/")
 
