@@ -24,7 +24,6 @@ def obtener_usuarios():
     return usuarios
 
 def eliminar_usuario(id):
-    print(__name__, id)
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute("DELETE FROM ussers WHERE id = %s", (id,))
@@ -88,7 +87,6 @@ def validar_actualizar_usuario():
     correo = request.form["correo"]
     nacionalidad = request.form["nacionalidad"]
     password = request.form["password"]
-    print(nombre, apellido, correo, nacionalidad, password, id)
     actualizar_usuario(nombre, apellido, correo, nacionalidad, password, id)
     return redirect("/")
 
