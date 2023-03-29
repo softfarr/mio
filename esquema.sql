@@ -1,0 +1,14 @@
+USE mysql;
+
+CREATE SCHEMA IF NOT EXISTS ussers;
+
+USE ussers;
+
+CREATE TABLE IF NOT exists ussers(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    correo VARCHAR(255) NOT NULL,
+    nacionalidad VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+ );

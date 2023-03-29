@@ -3,6 +3,6 @@ def obtener_conexion():
     return pymysql.connect(
     host='localhost',
     user='root',
-    password='',
-    database='users'
+    password='$Root123',
+    database='ussers'
 )

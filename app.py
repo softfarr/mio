@@ -2,83 +2,103 @@ from flask import Flask, render_template, request, redirect, url_for
 import os
 from database import obtener_conexion 
 
-#template_dir = (os.path.dirname(os.path.abspath.dirname(__file__)))
-#template_dir = os.path.join(template_dir,'src', 'templates')
+def insertar_usuario(nombre, apellido, correo, nacionalidad, password):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("INSERT INTO ussers(nombre, apellido, correo, nacionalidad, password) VALUES (%s, %s, %s, %s, %s)",
+                        (nombre, apellido, correo, nacionalidad, password))
+        conexion.commit()
+        conexion.close()
+    except Exception as e: 
+        print(str(e))
+
+
+def obtener_usuarios():
+    conexion = obtener_conexion()
+    usuarios = []
+    with conexion.cursor() as cursor:
+        cursor.execute("SELECT id, nombre, apellido, correo, nacionalidad, password FROM ussers")
+        usuarios = cursor.fetchall()
+    conexion.close()
+    return usuarios
+
+def eliminar_usuario(id):
+    print(__name__, id)
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("DELETE FROM ussers WHERE id = %s", (id,))
+    conexion.commit()
+    conexion.close()
+
+def obtener_usuario_por_id(id):
+    conexion = obtener_conexion()
+    usuario = None
+    with conexion.cursor() as cursor:
+        cursor.execute(
+            "SELECT id, nombre, apellido, correo, nacionalidad, password FROM ussers WHERE id = %s", (id,))
+        usuario = cursor.fetchone()
+    conexion.close()
+    return usuario
+
+def actualizar_usuario(nombre, apellido, correo, nacionalidad, password, id):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("UPDATE ussers SET nombre = %s, apellido = %s, correo = %s , nacionalidad = %s, password = %s WHERE id = %s",
+                       (nombre, apellido, correo, nacionalidad, password, id))
+    conexion.commit()
+    conexion.close()
 
 app= Flask (__name__)
 
 @app.route('/')
 def home():
     try: 
-        conexion = obtener_conexion ()
-        cursor = conexion.cursor()
-        cursor.execute("SELECT * FROM ussers")
-        myresult = cursor.fetchall()
-        insertObject =[]
-        columnNames =[column[0] for column in cursor.description]
-        for record in myresult:
-            #print(record)
-            insertObject.append(dict(zip(columnNames, record)))
-        #print ("columnNames=====", columnNames)
-        #print ("insertObject=====", insertObject )
-        cursor.close()
-        return render_template('index.html', data=insertObject)
+        usuarios = obtener_usuarios()
+        return render_template("index.html", usuarios=usuarios)
     except Exception as e: 
         return str(e)
     
-'''
 @app.route('/agregar_usuario')
-def formulario_registro():
-    return render_template("registro.html")
+def agregar_usuario():
+    return render_template("agregar_usuario.html")
 
-@app.route('/usser', methods=['POST'])
-def addUser():
-    identt=request.form['identt']
-    name=request.form['name']
-    lasname=request.form['lasname']
-    email=request.form['email']
-    nacionalidad=request.form['nacionalidad']
-    contrasena=request.form['contrasena']
+@app.route("/guardar_usuario", methods=["POST"])
+def guardar_usuario():
+    nombre = request.form["nombre"]
+    apellido = request.form["apellido"]
+    correo = request.form["correo"]
+    nacionalidad = request.form["nacionalidad"]
+    password = request.form["password"]
+    print(__name__)
+    insertar_usuario(nombre, apellido, correo, nacionalidad, password)
+    return redirect(url_for("home"))
 
-    if identt and name and lasname and email and nacionalidad and contrasena:
-        cursor = db.database.cursor()
-        sql = "INSERT INTO ussers (identt, name, apellido, email, nacionalidad, contraseña) VALUES (%s, %s, %s, %s, %s, %s)"
-        data= (identt, name, lasname, email, nacionalidad, contrasena)
-        cursor.execute(sql, data)
-        db.database.commit()
-    return redirect(url_for('home'))
+@app.route("/eliminar_usuario", methods=["POST"])
+def eliminar_usrio():
+    print(__name__, request.form["id"])
+    eliminar_usuario(request.form["id"])
+    return redirect(url_for("home"))
 
-@app.route('/delete/<string:id>')
-def delete(id):
-    cursor = db.database.cursor()
-    sql = "DELETE FROM users WHERE identt= %s"
-    data= (id,)
-    cursor.execute(sql, data)
-    db.database.commit()
-    return redirect(url_for('home'))
+@app.route('/editar_usuario/<string:id>', methods=['POST'])
+def editar_usuario(id):
+    id=request.form['id']
+    usuario = obtener_usuario_por_id(id)
+    print(usuario)
+    return render_template("ed_usuario.html", usuario=usuario)
 
-@app.route('/edit/<string:id>', methods=['POST'])
-def edit(id):
-    identt=request.form['identt']
-    name=request.form['name']
-    lasname=request.form['lasname']
-    email=request.form['email']
-    nacionalidad=request.form['nacionalidad']
-    contrasena=request.form['contrasena']
+@app.route("/actualizar_usuario", methods=["POST"])
+def actualizar_usuario():
+    id = request.form["id"]
+    nombre = request.form["nombre"]
+    apellido = request.form["apellido"]
+    correo = request.form["correo"]
+    nacionalidad = request.form["nacionalidad"]
+    password = request.form["password"]
+    actualizar_usuario(nombre, apellido, correo, nacionalidad, password, id)
+    return redirect("/")
 
-    if identt and name and lasname and email and nacionalidad and contrasena:
-        cursor = db.database.cursor()
-        sql = "UPDATE users SET identt= %s, name =%s, apellido=%s, email=%s, nacionalidad=%s, contraseña=%s WHERE id =%s"
-        data= (identt, name, lasname, email, nacionalidad, contrasena, id)
-        cursor.execute(sql, data)
-        db.database.commit()
-    return redirect(url_for('home'))
 
-@app.route('/editarinf/<int:id>')
-def editarinf(id):
-    #editarinf=controlador.optenerPorid (id)
-    return render_template("editarinf.html")
-
-'''
 if __name__=='__main__':
-    app.run(debug=True, port=8080)
+    #app.run(debug=True, port=8080)
+    app.run(debug=True, port=4321)
